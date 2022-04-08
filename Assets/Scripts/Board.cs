@@ -26,8 +26,8 @@ public class Board : MonoBehaviour
     private void Awake() => Instance = this;
 
     private void Start(){   
-        height = 9;
-        width = 4;
+        height = 5;
+        width = 8;
 
         createBoard(height,width);
         initTiles(height, width);       
@@ -89,7 +89,9 @@ public class Board : MonoBehaviour
 
         Debug.Log(message:$"Selected tiles: ({_selection[0].y}, {_selection[0].x}) and ({_selection[1].y}, {_selection[1].x})");
 
-        await Swap(_selection[0], _selection[1]);
+        if(areNeighbours(_selection[0], _selection[1]))
+            await Swap(_selection[0], _selection[1]);
+        
         
         _selection.Clear();
 
@@ -121,6 +123,11 @@ public class Board : MonoBehaviour
         tile1.Item = tile2.Item;
         tile2.Item = tile1Item;
 
+    }
+
+    public bool areNeighbours(Tile tile1, Tile tile2){
+        if((tile1.x == tile2.x && Mathf.Abs(tile1.y-tile2.y) == 1) || (tile1.y == tile2.y && Mathf.Abs(tile1.x-tile2.x) == 1)) return true;
+        return false;
     }
 
 
