@@ -7,17 +7,21 @@ using UnityEngine;
 public class Board : MonoBehaviour
 {
     public GameObject rowPrefab;
+    public Sprite succesSprite;
 
     public static Board Instance {get; private set;} //Singleton Pattern
     public List<Row> rows;
+    public List<int> lockedRows;
     public Tile[,] tiles {get; private set;}
 
     // public int width => tiles.GetLength(dimension:0);
     // public int height => tiles.GetLength(dimension:1);
     public int width;
     public int height;
+    public int moves;
+    public int score;
 
-    private List<Tile> _selection = new List<Tile>();
+    private List<Tile> _selection;
 
     private const float TweenDuration = 0.25f;
 
@@ -26,8 +30,12 @@ public class Board : MonoBehaviour
     private void Awake() => Instance = this;
 
     private void Start(){   
-        height = 5;
-        width = 8;
+        height = 8;
+        width = 4;
+        score = 0;
+        moves = 0;
+        _selection = new List<Tile>();
+        lockedRows = new List<int>();
 
         createBoard(height,width);
         initTiles(height, width);       
@@ -81,7 +89,7 @@ public class Board : MonoBehaviour
     }
 
     public async void Select(Tile tile){
-        if(!_selection.Contains(tile)){
+        if(!_selection.Contains(tile) && !isRowLocked(tile.y)){
             _selection.Add(tile);
         }
         
@@ -89,8 +97,12 @@ public class Board : MonoBehaviour
 
         Debug.Log(message:$"Selected tiles: ({_selection[0].y}, {_selection[0].x}) and ({_selection[1].y}, {_selection[1].x})");
 
-        if(areNeighbours(_selection[0], _selection[1]))
+        if(areTilesNeighbour(_selection[0], _selection[1])){
             await Swap(_selection[0], _selection[1]);
+            checkRows(_selection[0], _selection[1]);
+            moves += 1;
+        }
+            
         
         
         _selection.Clear();
@@ -125,10 +137,66 @@ public class Board : MonoBehaviour
 
     }
 
-    public bool areNeighbours(Tile tile1, Tile tile2){
+    public bool areTilesNeighbour(Tile tile1, Tile tile2){
         if((tile1.x == tile2.x && Mathf.Abs(tile1.y-tile2.y) == 1) || (tile1.y == tile2.y && Mathf.Abs(tile1.x-tile2.x) == 1)) return true;
         return false;
     }
 
+    public bool checkRowMatch(int row){
+        Item temp = tiles[row,0].Item;
+        bool is_match = true;
+        for (int i = 1; i < width; i++)
+        {
+            if (tiles[row,i].Item != temp)
+            {
+                is_match = false;
+                break;
+            }
+        }
+        return is_match;
+    }
+    public void checkRows(Tile tile1, Tile tile2){
+        int row1 = tile1.y;
+        int row2 = tile2.y;
+        bool is_match1;
+        bool is_match2;
+        if (row1 == row2)
+        {
+            return;
+        }
+        
+        is_match1 = checkRowMatch(row1);
+        is_match2 = checkRowMatch(row2);
+
+        if (is_match1){
+            score += tile1.Item.value;
+            lockRow(row1);
+        }
+        if (is_match2)
+        {
+            score += tile2.Item.value;
+            lockRow(row2);
+        }
+
+    }
+
+    
+
+    public void lockRow(int row){
+        for (int i = 0; i < width; i++)
+        {
+            tiles[row, i].icon.transform.DOScale(1.25f, TweenDuration).Play();
+            tiles[row, i].icon.sprite = succesSprite;
+            // tiles[row, i].Item.sprite = succesSprite;
+            //TODO icon success değiştir
+        }
+        lockedRows.Add(row);
+    }
+
+    public bool isRowLocked(int row){
+        if(!lockedRows.Contains(row))
+            return false;
+        return true;
+    }
 
 }
