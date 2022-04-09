@@ -18,7 +18,20 @@ public class Tile : MonoBehaviour
     public Image icon;
     public Button button;
 
+    // public Tile Left => x > 0 ? Board.Instance.tiles[y, x-1] : null;
+    // public Tile Top => y > 0 ? Board.Instance.tiles[y-1, x] : null;
+    // public Tile Right => x < Board.Instance.width - 1 ? Board.Instance.tiles[y, x+1] : null;
+    // public Tile Bottom => y < Board.Instance.height - 1 ? Board.Instance.tiles[y+1, x] : null;
+
+    // public Tile[] Neighbours => new[]{
+    //     Left,
+    //     Top,
+    //     Right,
+    //     Bottom,
+    // };
+
     private void Start() => button.onClick.AddListener(call:() => Board.Instance.Select(tile:this));
         
+    
     
 }

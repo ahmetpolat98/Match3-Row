@@ -6,13 +6,16 @@ using UnityEngine;
 
 public class Board : MonoBehaviour
 {
+    public static Board Instance {get; private set;} //Singleton Pattern
     public GameObject rowPrefab;
     public Sprite succesSprite;
 
-    public static Board Instance {get; private set;} //Singleton Pattern
+
     public List<Row> rows;
     public List<int> lockedRows;
     public Tile[,] tiles {get; private set;}
+    private List<Tile> _selection;
+    public LevelData currentLevel;
 
     // public int width => tiles.GetLength(dimension:0);
     // public int height => tiles.GetLength(dimension:1);
@@ -21,17 +24,16 @@ public class Board : MonoBehaviour
     public int moves;
     public int score;
 
-    private List<Tile> _selection;
-
+    
     private const float TweenDuration = 0.25f;
-
 
 
     private void Awake() => Instance = this;
 
-    private void Start(){   
-        height = 8;
-        width = 4;
+    private void Start(){
+        currentLevel = CurrentLevel.currentLevel;
+        height = currentLevel.grid_height;
+        width = currentLevel.grid_width;
         score = 0;
         moves = 0;
         _selection = new List<Tile>();

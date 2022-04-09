@@ -328,11 +328,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rowPrefab: {fileID: 1455925104235040921, guid: 735f3c490a3a3d84db2f88138db94294,
     type: 3}
+  succesSprite: {fileID: 21300000, guid: 63119e5807f646948bcfd2b448c17c30, type: 3}
   rows:
   - {fileID: 933544348}
   - {fileID: 1766867505}
   - {fileID: 1214197970}
   - {fileID: 1919224440}
+  lockedRows: 
+  width: 0
+  height: 0
+  moves: 0
+  score: 0
 --- !u!114 &695610278
 MonoBehaviour:
   m_ObjectHideFlags: 0
