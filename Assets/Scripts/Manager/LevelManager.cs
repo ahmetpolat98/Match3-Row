@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using UnityEngine.Networking;
 
 public class LevelManager : MonoBehaviour
 {
     public GameObject levelPrefab;
-    private List<string> levelFiles; //= {"RM_A1", "RM_A2", "RM_A3", "RM_A4", "RM_A5", "RM_A6", "RM_A7", "RM_A8", "RM_A9", "RM_A10"};
+    private List<string> levelFiles;
     private List<string> levelData;
     private List<string> saveLevelData;
     private List<string> newScoreLvlData;
@@ -21,6 +22,7 @@ public class LevelManager : MonoBehaviour
         newScoreLvlData = new List<string>();
         levelFiles = new List<string>();
 
+        // StartCoroutine(downloadLevel());
 
         readDownloadedFiles();       
 
@@ -59,9 +61,25 @@ public class LevelManager : MonoBehaviour
 
     }
 
-    private void downloadLevel(){
-        
-    }
+    // private IEnumerator downloadLevel(){
+    //         UnityWebRequest www = new UnityWebRequest("https://row-match.s3.amazonaws.com/levels/RM_B10");
+    //         www.downloadHandler = new DownloadHandlerBuffer();
+    //         yield return www.SendWebRequest();
+
+    //         if(www.isNetworkError || www.isHttpError) {
+                
+    //             Debug.Log(www.error);
+    //         }
+    //         else
+    //         {
+    //             string[] values = www.downloadHandler.text.Split(" "[0]);
+    //             foreach (var item in values)
+    //             {
+    //                 Debug.Log("++++");
+    //                 Debug.Log(item);
+    //             }
+    //         }
+    // }
     private void createLevels(){
         for(int i = 1; i <= 25; i++){
             GameObject newLevel = Instantiate(levelPrefab);
