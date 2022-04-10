@@ -22,6 +22,8 @@ public class Board : MonoBehaviour
     public int width;
     public int height;
     public int moves;
+    public int remain_moves;
+    // public int high_score;
     public int score;
 
     
@@ -34,6 +36,8 @@ public class Board : MonoBehaviour
         currentLevel = CurrentLevel.currentLevel;
         height = currentLevel.grid_height;
         width = currentLevel.grid_width;
+        remain_moves = currentLevel.move_count;
+        // high_score = currentLevel.high_score;
         score = 0;
         moves = 0;
         _selection = new List<Tile>();
@@ -72,6 +76,8 @@ public class Board : MonoBehaviour
     public void initTiles(int lvl_height, int lvl_width){
         tiles = new Tile[lvl_height, lvl_width];
 
+        int gridNo = 0;
+
         for (int i = 0; i < lvl_height; i++)
         {
             for (int j = 0; j < lvl_width; j++)
@@ -81,12 +87,39 @@ public class Board : MonoBehaviour
                 tile.x = j;
                 tile.y = i;
 
-                tile.Item = ItemDatabase.Items[Random.Range(0, ItemDatabase.Items.Length)];
+                tile.Item = ItemDatabase.Items[findItem(currentLevel.grid[gridNo])];
+                gridNo += 1;
                 // tile.Item = ItemDatabase.Items[2]; // TODO find item.id
 
                 tiles[i, j] = tile;
             }
             
+        }
+    }
+
+    private int findItem(string colour){
+        switch (colour)
+        {
+            case "b":
+                {
+                    return 0;
+                }
+            case "g":
+                {
+                    return 1;
+                }
+            case "r":
+                {
+                    return 2;
+                }
+            case "y":
+                {
+                    return 3;
+                }
+            default:
+                {
+                    return 0;
+                }
         }
     }
 

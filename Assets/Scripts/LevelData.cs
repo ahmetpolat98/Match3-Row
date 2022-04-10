@@ -11,6 +11,10 @@ public class LevelData
     public int high_score=0;
     public bool locked=false;
     public List<string> grid=null;
+
+    public LevelData(){
+        grid = new List<string>();
+    }
 }
 
 public class CurrentLevel
