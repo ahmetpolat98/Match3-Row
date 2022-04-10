@@ -7,9 +7,10 @@ using System.Linq;
 public class LevelManager : MonoBehaviour
 {
     public GameObject levelPrefab;
-    private string[] levelFiles = {"RM_A1", "RM_A2", "RM_A3", "RM_A4", "RM_A5", "RM_A6", "RM_A7", "RM_A8", "RM_A9", "RM_A10"};
+    private List<string> levelFiles; //= {"RM_A1", "RM_A2", "RM_A3", "RM_A4", "RM_A5", "RM_A6", "RM_A7", "RM_A8", "RM_A9", "RM_A10"};
     private List<string> levelData;
     private List<string> saveLevelData;
+    private List<string> newScoreLvlData;
 
     private string level_path;
     private string save_level_data_path;
@@ -17,20 +18,50 @@ public class LevelManager : MonoBehaviour
     void Start(){
         levelData = new List<string>();
         saveLevelData = new List<string>();
+        newScoreLvlData = new List<string>();
+        levelFiles = new List<string>();
 
+
+        readDownloadedFiles();       
+
+        if(CurrentLevel.currentLevel != null){
+            if (PlayedLevel.score > CurrentLevel.currentLevel.high_score && PlayedLevel.playedLevelNo == CurrentLevel.currentLevel.level_number)
+            {
+                Debug.Log("High Score!");
+                writeNewHighScore();
+            }
+        }
+        
         createLevels();
+        
+        int lvl_no = 1;
 
+        //read data from lvl files and save files
         foreach (string item in levelFiles)
         {
             level_path = Application.streamingAssetsPath + "/Levels/" + item;
-            save_level_data_path = Application.streamingAssetsPath + "/SaveLevelData/" + item;
+            save_level_data_path = Application.streamingAssetsPath + "/SaveLevelData/" + lvl_no;
             Debug.Log(level_path);//
             readLevelData();
             readSaveLevelData();
+            lvl_no += 1;
         }
      
     }
 
+    private void readDownloadedFiles(){
+        string path = Application.streamingAssetsPath + "/downloaded_files";
+        List<string> fileLines = File.ReadAllLines(path).ToList();
+        foreach (string line in fileLines)
+        {
+           levelFiles.Add(line);
+        }
+
+    }
+
+    private void downloadLevel(){
+        
+    }
     private void createLevels(){
         for(int i = 1; i <= 25; i++){
             GameObject newLevel = Instantiate(levelPrefab);
@@ -79,10 +110,6 @@ public class LevelManager : MonoBehaviour
         {
             level.levelData.grid.Add(item);
         }
-
-       
-
-
         // level.levelData.grid = levelData[4]();
         // levelGameObject.SetActive(false);
     }
@@ -104,8 +131,47 @@ public class LevelManager : MonoBehaviour
         level.checkLocked();
     }
 
+    private void writeNewHighScore(){
+        string path1 = Application.streamingAssetsPath + "/SaveLevelData/" + PlayedLevel.playedLevelNo;
+        int nextLvl = PlayedLevel.playedLevelNo + 1;
+        string path2 = Application.streamingAssetsPath + "/SaveLevelData/" + nextLvl;
+
+        string write_data1 = "locked: 0";
+        string write_data2 = "highest_score: " + PlayedLevel.score;
+
+        List<string> write_data = new List<string>();
+        write_data.Add(write_data1);
+        write_data.Add(write_data2);    
+
+        File.WriteAllLines(path1, write_data);
+    
+        try
+        {
+            List<string> fileLines = File.ReadAllLines(path2).ToList();
+            newScoreLvlData.Clear();
+            foreach (string line in fileLines)
+            {
+                string[] values = line.Split(" "[0]);
+                newScoreLvlData.Add(values[1]);         
+            }
+            int high_score = int.Parse(newScoreLvlData[1]);
+
+            write_data.Clear();
+
+            write_data1 = "locked: 0";
+            write_data2 = "highest_score: " + high_score;
+
+            write_data.Add(write_data1);
+            write_data.Add(write_data2);
 
 
+            File.WriteAllLines(path2, write_data);
+            }
+        catch (System.Exception)
+        {            
+            throw;
+        }
 
-    // writeToFile
+    }
+
 }

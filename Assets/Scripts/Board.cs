@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Board : MonoBehaviour
 {
@@ -10,6 +11,9 @@ public class Board : MonoBehaviour
     public GameObject rowPrefab;
     public Sprite succesSprite;
 
+    public Text scoreText;
+    public Text remainMovesText;
+    public Text highestScoreText;
 
     public List<Row> rows;
     public List<int> lockedRows;
@@ -45,6 +49,8 @@ public class Board : MonoBehaviour
 
         createBoard(height,width);
         initTiles(height, width);       
+
+        updateText();
 
     }
 
@@ -139,11 +145,11 @@ public class Board : MonoBehaviour
             checkRows(_selection[0], _selection[1]);
             remain_moves -= 1;
             moves += 1;
+            updateText();
         }
-
         _selection.Clear();
 
-        if (!is_remain_move)
+        if (remain_moves == 0)
         {
             endGame();
         }
@@ -163,7 +169,6 @@ public class Board : MonoBehaviour
                 .Join(icon2Transform.DOMove(icon1Transform.position, TweenDuration));
 
         await sequence.Play().AsyncWaitForCompletion();
-
 
         icon1Transform.SetParent(tile2.transform);
         icon2Transform.SetParent(tile1.transform);
@@ -246,9 +251,17 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    //TODO scene geçiş, score'u yazdır.
     private void endGame(){
-        Debug.Log("Game Over");
+        PlayedLevel.playedLevelNo = currentLevel.level_number;
+        PlayedLevel.score = score;
+        ScenesManager.LoadLevels();
     }
+
+    private void updateText(){
+        highestScoreText.text = "Highest Score: " + currentLevel.high_score;
+        scoreText.text = "Score: " + score;
+        remainMovesText.text = "Remain Moves: " + remain_moves;
+    }
+
 
 }

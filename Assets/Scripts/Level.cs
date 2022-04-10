@@ -51,13 +51,4 @@ public class Level : MonoBehaviour
 
     }
 
-    private void unlock(){
-
-    }
-
-
-    
-
-        
-
 }

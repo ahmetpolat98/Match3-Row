@@ -26,3 +26,9 @@ public class CurrentLevel
     }
 }
 
+public class PlayedLevel
+{
+    public static int playedLevelNo;
+    public static int score;
+
+}

@@ -5,9 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class ScenesManager : MonoBehaviour
 {
-    // public static ScenesManager Instance {get; private set;}
-
-    // private void Awake() => Instance = this;
+    
     public static void LoadGame(LevelData lvl){
         CurrentLevel.initCurrentLevel();
         CurrentLevel.currentLevel.level_number = lvl.level_number;
@@ -20,6 +18,8 @@ public class ScenesManager : MonoBehaviour
         SceneManager.LoadScene("Game");
     }
 
-    
+    public static void LoadLevels(){
+        SceneManager.LoadScene("MainScene");
+    }
     
 }
