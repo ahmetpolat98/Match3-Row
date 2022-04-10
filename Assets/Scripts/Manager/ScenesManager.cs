@@ -19,5 +19,7 @@ public class ScenesManager : MonoBehaviour
         
         SceneManager.LoadScene("Game");
     }
+
+    
     
 }

@@ -132,15 +132,21 @@ public class Board : MonoBehaviour
 
         Debug.Log(message:$"Selected tiles: ({_selection[0].y}, {_selection[0].x}) and ({_selection[1].y}, {_selection[1].x})");
 
-        if(areTilesNeighbour(_selection[0], _selection[1])){
+        bool is_remain_move = isRemainMove();
+
+        if(areTilesNeighbour(_selection[0], _selection[1]) && is_remain_move){
             await Swap(_selection[0], _selection[1]);
             checkRows(_selection[0], _selection[1]);
+            remain_moves -= 1;
             moves += 1;
         }
-            
-        
-        
+
         _selection.Clear();
+
+        if (!is_remain_move)
+        {
+            endGame();
+        }
 
     }
 
@@ -215,7 +221,13 @@ public class Board : MonoBehaviour
 
     }
 
-    
+    public bool isRemainMove(){
+        if (remain_moves <= 0)
+        {
+            return false;
+        }
+        return true;
+    }
 
     public void lockRow(int row){
         for (int i = 0; i < width; i++)
@@ -232,6 +244,11 @@ public class Board : MonoBehaviour
         if(!lockedRows.Contains(row))
             return false;
         return true;
+    }
+
+    //TODO scene geçiş, score'u yazdır.
+    private void endGame(){
+        Debug.Log("Game Over");
     }
 
 }

@@ -9,7 +9,7 @@ public class LevelData
     public int grid_width=0;
     public int move_count=0;
     public int high_score=0;
-    public bool locked=false;
+    public bool locked=true;
     public List<string> grid=null;
 
     public LevelData(){
