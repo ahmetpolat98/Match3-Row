@@ -53,7 +53,7 @@ public class LevelManager : MonoBehaviour
         {
             level_path = Application.streamingAssetsPath + "/Levels/" + item;
             save_level_data_path = Application.streamingAssetsPath + "/SaveLevelData/" + lvl_no;
-            Debug.Log(level_path);//
+            // Debug.Log(level_path);//
             readLevelData(level_path);
             initLevelData();
 
@@ -65,6 +65,7 @@ public class LevelManager : MonoBehaviour
 
 
     private void readDownloadedFiles(){
+        levelFiles.Clear();
         string path = Application.streamingAssetsPath + "/downloaded_files";
         List<string> fileLines = File.ReadAllLines(path).ToList();
         foreach (string line in fileLines)
@@ -82,64 +83,27 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    // private void downloadUrlFile(){
-    //     string path = Application.streamingAssetsPath + "/level_urls";
 
-    //     List<string> fileLines = File.ReadAllLines(path).ToList();
+    private void writeLevelFile(string text){
+        Debug.Log("Save Downloaded Level File");
+        string[] download_file_values = text.Split(' ', '\n');
 
-    //     Debug.Log("****readURL File*****");
+        string path = Application.streamingAssetsPath + "/Levels/" + download_file_values[1];
+        File.WriteAllText(path, text);
 
-    //     for (int i = 0; i < 15; i++)
-    //     {
-    //         downloadlevelData.Clear();
-
-    //         string line_first = File.ReadLines(path).First();
-    //         List<string> lines_except_first = File.ReadLines(path).Skip(1).ToList();
-
-    //         string[] values = line_first.Split(" "[0]);
-    //         Debug.Log(values[0]);
-    //         Debug.Log(values[1]);
-    //         downloadlevelData.Add(values[0]);
-    //         downloadlevelData.Add(values[1]);
-            
-    //         downloadLevel(downloadlevelData[1]);
-
-    //         File.WriteAllLines(path, lines_except_first);
-
-    //     }
-
-
-    //     // foreach (string line in fileLines)
-    //     // {
-    //     //    Debug.Log("*********");
-    //     //    Debug.Log(line);
-    //     // }
-
-    // }
-
-    // private void readUrlFileFirstLine(string path){
-
-    // }
-
-    private void writeLevelFile(string[] values){
-        Debug.Log("--writeLevelFile--");
-        foreach (var item in values)
-                {
-                    Debug.Log("++1++");
-                    Debug.Log(item);
-
-                    // TODO yüklenen lvl dosyasının en altına lcl no ekle
-                    // TODO levels klasörünün içine lvl no dosyası oluştur
-         }
+        
+        string downloaded_path = Application.streamingAssetsPath + "/downloaded_files";
+        File.AppendAllText(downloaded_path, "\n");
+        File.AppendAllText(downloaded_path, download_file_values[1]);
     }
 
     private IEnumerator downloadLevel(){
             string path = Application.streamingAssetsPath + "/level_urls";
 
             List<string> fileLines = File.ReadAllLines(path).ToList();
-            
+            bool connection = false;
 
-            Debug.Log("****readURL File*****");
+            Debug.Log("Read lvl url file to download.");
 
             for (int i = 0; i < fileLines.Count; i++) // dosya bitene kadar
             {
@@ -149,10 +113,10 @@ public class LevelManager : MonoBehaviour
                 List<string> lines_except_first = File.ReadLines(path).Skip(1).ToList();
 
                 string[] values = line_first.Split(" "[0]);
-                Debug.Log("indirilen dosya: ");
-                Debug.Log(i+1);
-                Debug.Log(values[0]);
-                Debug.Log(values[1]);
+                Debug.Log("Downloading Levels..");
+                // Debug.Log(i+1);
+                // Debug.Log(values[0]);
+                // Debug.Log(values[1]);
                 downloadlevelData.Add(values[0]);
                 downloadlevelData.Add(values[1]);
                 
@@ -164,23 +128,25 @@ public class LevelManager : MonoBehaviour
                 if(www.isNetworkError || www.isHttpError) {
                     
                     Debug.Log(www.error);
+                    break;//not try the remaining downloads so that the priority order of the level numbers does not change.
                 }
                 else
                 {
-                    string[] download_file_values = www.downloadHandler.text.Split(" "[0]);
-                    writeLevelFile(download_file_values);
+
+                    writeLevelFile(www.downloadHandler.text);
                     File.WriteAllLines(path, lines_except_first);
+                    connection = true;
                 }
-                
-
             }
-
+            // TODO lvler indirildikten sonra lvl file okuma işlemlerini yap, lvler güncellensin
+            if(fileLines.Count>=1 && connection){
+                readDownloadedFiles();
+                readFiles();
+            }
+            
             
     }
 
-
-
-    
 
     private void readLevelData(string path){
         List<string> fileLines = File.ReadAllLines(path).ToList();
@@ -199,7 +165,7 @@ public class LevelManager : MonoBehaviour
         foreach (string line in fileLines)
         {
             string[] values = line.Split(" "[0]);
-            Debug.Log(values[1]);
+            // Debug.Log(values[1]);
             saveLevelData.Add(values[1]);         
         }
     }
@@ -231,9 +197,9 @@ public class LevelManager : MonoBehaviour
         else
             level.levelData.locked = true;   
 
-        Debug.Log("-----");
-        Debug.Log(level.levelData.locked);
-        Debug.Log(level.levelData.high_score);
+        // Debug.Log("-----");
+        // Debug.Log(level.levelData.locked);
+        // Debug.Log(level.levelData.high_score);
         level.updateText();
         level.checkLocked();
     }
