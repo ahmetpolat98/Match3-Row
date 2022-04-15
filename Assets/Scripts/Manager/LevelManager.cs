@@ -12,6 +12,8 @@ public class LevelManager : MonoBehaviour
     private List<string> levelData;
     private List<string> saveLevelData;
     private List<string> newScoreLvlData;
+    private List<string> urls;
+    private List<string> downloadlevelData;
 
     private string level_path;
     private string save_level_data_path;
@@ -21,10 +23,14 @@ public class LevelManager : MonoBehaviour
         saveLevelData = new List<string>();
         newScoreLvlData = new List<string>();
         levelFiles = new List<string>();
+        downloadlevelData = new List<string>();
+        urls = new List<string>();
 
-        // StartCoroutine(downloadLevel());
 
-        readDownloadedFiles();       
+        StartCoroutine(downloadLevel());
+
+        readDownloadedFiles();
+
 
         if(CurrentLevel.currentLevel != null){
             if (PlayedLevel.score > CurrentLevel.currentLevel.high_score && PlayedLevel.playedLevelNo == CurrentLevel.currentLevel.level_number)
@@ -35,7 +41,11 @@ public class LevelManager : MonoBehaviour
         }
         
         createLevels();
-        
+
+        readFiles();       
+     
+    }
+    private void readFiles(){
         int lvl_no = 1;
 
         //read data from lvl files and save files
@@ -44,12 +54,15 @@ public class LevelManager : MonoBehaviour
             level_path = Application.streamingAssetsPath + "/Levels/" + item;
             save_level_data_path = Application.streamingAssetsPath + "/SaveLevelData/" + lvl_no;
             Debug.Log(level_path);//
-            readLevelData();
-            readSaveLevelData();
+            readLevelData(level_path);
+            initLevelData();
+
+            readSaveLevelData(save_level_data_path);
+            initSaveLevelData();
             lvl_no += 1;
         }
-     
     }
+
 
     private void readDownloadedFiles(){
         string path = Application.streamingAssetsPath + "/downloaded_files";
@@ -58,28 +71,8 @@ public class LevelManager : MonoBehaviour
         {
            levelFiles.Add(line);
         }
-
     }
 
-    // private IEnumerator downloadLevel(){
-    //         UnityWebRequest www = new UnityWebRequest("https://row-match.s3.amazonaws.com/levels/RM_B10");
-    //         www.downloadHandler = new DownloadHandlerBuffer();
-    //         yield return www.SendWebRequest();
-
-    //         if(www.isNetworkError || www.isHttpError) {
-                
-    //             Debug.Log(www.error);
-    //         }
-    //         else
-    //         {
-    //             string[] values = www.downloadHandler.text.Split(" "[0]);
-    //             foreach (var item in values)
-    //             {
-    //                 Debug.Log("++++");
-    //                 Debug.Log(item);
-    //             }
-    //         }
-    // }
     private void createLevels(){
         for(int i = 1; i <= 25; i++){
             GameObject newLevel = Instantiate(levelPrefab);
@@ -89,8 +82,108 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    private void readLevelData(){
-        List<string> fileLines = File.ReadAllLines(level_path).ToList();
+    // private void downloadUrlFile(){
+    //     string path = Application.streamingAssetsPath + "/level_urls";
+
+    //     List<string> fileLines = File.ReadAllLines(path).ToList();
+
+    //     Debug.Log("****readURL File*****");
+
+    //     for (int i = 0; i < 15; i++)
+    //     {
+    //         downloadlevelData.Clear();
+
+    //         string line_first = File.ReadLines(path).First();
+    //         List<string> lines_except_first = File.ReadLines(path).Skip(1).ToList();
+
+    //         string[] values = line_first.Split(" "[0]);
+    //         Debug.Log(values[0]);
+    //         Debug.Log(values[1]);
+    //         downloadlevelData.Add(values[0]);
+    //         downloadlevelData.Add(values[1]);
+            
+    //         downloadLevel(downloadlevelData[1]);
+
+    //         File.WriteAllLines(path, lines_except_first);
+
+    //     }
+
+
+    //     // foreach (string line in fileLines)
+    //     // {
+    //     //    Debug.Log("*********");
+    //     //    Debug.Log(line);
+    //     // }
+
+    // }
+
+    // private void readUrlFileFirstLine(string path){
+
+    // }
+
+    private void writeLevelFile(string[] values){
+        Debug.Log("--writeLevelFile--");
+        foreach (var item in values)
+                {
+                    Debug.Log("++1++");
+                    Debug.Log(item);
+
+                    // TODO yüklenen lvl dosyasının en altına lcl no ekle
+                    // TODO levels klasörünün içine lvl no dosyası oluştur
+         }
+    }
+
+    private IEnumerator downloadLevel(){
+            string path = Application.streamingAssetsPath + "/level_urls";
+
+            List<string> fileLines = File.ReadAllLines(path).ToList();
+            
+
+            Debug.Log("****readURL File*****");
+
+            for (int i = 0; i < fileLines.Count; i++) // dosya bitene kadar
+            {
+                downloadlevelData.Clear();
+
+                string line_first = File.ReadLines(path).First();
+                List<string> lines_except_first = File.ReadLines(path).Skip(1).ToList();
+
+                string[] values = line_first.Split(" "[0]);
+                Debug.Log("indirilen dosya: ");
+                Debug.Log(i+1);
+                Debug.Log(values[0]);
+                Debug.Log(values[1]);
+                downloadlevelData.Add(values[0]);
+                downloadlevelData.Add(values[1]);
+                
+
+                UnityWebRequest www = new UnityWebRequest(downloadlevelData[1]);
+                www.downloadHandler = new DownloadHandlerBuffer();
+                yield return www.SendWebRequest();
+
+                if(www.isNetworkError || www.isHttpError) {
+                    
+                    Debug.Log(www.error);
+                }
+                else
+                {
+                    string[] download_file_values = www.downloadHandler.text.Split(" "[0]);
+                    writeLevelFile(download_file_values);
+                    File.WriteAllLines(path, lines_except_first);
+                }
+                
+
+            }
+
+            
+    }
+
+
+
+    
+
+    private void readLevelData(string path){
+        List<string> fileLines = File.ReadAllLines(path).ToList();
         levelData.Clear();
         foreach (string line in fileLines)
         {
@@ -98,10 +191,9 @@ public class LevelManager : MonoBehaviour
             // Debug.Log(values[1]);
             levelData.Add(values[1]);         
         }
-        initLevelData();
     }
 
-    private void readSaveLevelData(){
+    private void readSaveLevelData(string path){
         List<string> fileLines = File.ReadAllLines(save_level_data_path).ToList();
         saveLevelData.Clear();
         foreach (string line in fileLines)
@@ -110,8 +202,6 @@ public class LevelManager : MonoBehaviour
             Debug.Log(values[1]);
             saveLevelData.Add(values[1]);         
         }
-        initSaveLevelData();
-
     }
 
     private void initLevelData(){
@@ -128,9 +218,8 @@ public class LevelManager : MonoBehaviour
         {
             level.levelData.grid.Add(item);
         }
-        // level.levelData.grid = levelData[4]();
-        // levelGameObject.SetActive(false);
     }
+
     private void initSaveLevelData(){
         GameObject levelGameObject = gameObject.transform.Find("Level "+levelData[0]).gameObject;
         Level level = levelGameObject.GetComponent<Level>();
@@ -189,7 +278,8 @@ public class LevelManager : MonoBehaviour
         {            
             throw;
         }
-
     }
+
+
 
 }

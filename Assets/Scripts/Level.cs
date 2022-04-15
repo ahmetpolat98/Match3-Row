@@ -19,19 +19,25 @@ public class Level : MonoBehaviour
         levelData = new LevelData();
     }
      private void Start(){        
-         //level datadan okunacak, filedan
-        //  levelData.grid_height = 8;
-        //  levelData.grid_width = 8;
-        //  levelData.move_count = 50;
-        //  levelData.locked = false;
-         checkLocked();
-         if(!levelData.locked)
+        checkLocked();
+        if(!levelData.locked)
             playButton.onClick.AddListener(call:() => ScenesManager.LoadGame(levelData));
      }
 
     public void updateText(){
         levelHeaderText.text = "Level " + levelData.level_number + " - " + levelData.move_count + " Moves";
-        highScoreText.text = "Highest Score: " + levelData.high_score;
+        if(levelData.locked){
+            highScoreText.text = "Locked Level";
+        }
+        else{
+            if(levelData.high_score == 0){
+            highScoreText.text = "No Score";
+            }
+            else
+            {
+                highScoreText.text = "Highest Score: " + levelData.high_score;
+            }
+        }
     }
 
 
