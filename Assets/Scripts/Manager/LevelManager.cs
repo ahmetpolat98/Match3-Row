@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour
     private List<string> levelData;
     private List<string> saveLevelData;
     private List<string> newScoreLvlData;
-    private List<string> urls;
+    // private List<string> urls;
     private List<string> downloadlevelData;
 
     private string level_path;
@@ -24,13 +24,12 @@ public class LevelManager : MonoBehaviour
         newScoreLvlData = new List<string>();
         levelFiles = new List<string>();
         downloadlevelData = new List<string>();
-        urls = new List<string>();
+        // urls = new List<string>();
 
 
         StartCoroutine(downloadLevel());
 
         readDownloadedFiles();
-
 
         if(CurrentLevel.currentLevel != null){
             if (PlayedLevel.score > CurrentLevel.currentLevel.high_score && PlayedLevel.playedLevelNo == CurrentLevel.currentLevel.level_number)
@@ -42,8 +41,7 @@ public class LevelManager : MonoBehaviour
         
         createLevels();
 
-        readFiles();       
-     
+        readFiles();    
     }
     private void readFiles(){
         int lvl_no = 1;

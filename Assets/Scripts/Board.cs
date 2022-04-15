@@ -30,7 +30,6 @@ public class Board : MonoBehaviour
     // public int high_score;
     public int score;
 
-    
     private const float TweenDuration = 0.25f;
 
 
@@ -149,7 +148,7 @@ public class Board : MonoBehaviour
         }
         _selection.Clear();
 
-        if (remain_moves == 0)
+        if (remain_moves == 0 || !checkPossibleMatch())
         {
             endGame();
         }
@@ -225,6 +224,58 @@ public class Board : MonoBehaviour
         }
 
     }
+
+    private bool checkPossibleMatch(){
+        int red_count = 0;
+        int blue_count = 0;
+        int yellow_count = 0;
+        int green_count = 0;
+
+        for (int i = 0; i < height; i++)
+        {
+            if(lockedRows.Contains(i)){
+                red_count = 0;
+                blue_count = 0;
+                yellow_count = 0;
+                green_count = 0;
+                continue;
+            }
+            for (int j = 0; j < width; j++)
+            {
+                
+                switch (tiles[i, j].Item.id)
+                {
+                    case 0:
+                        {
+                            blue_count += 1;
+                            break;
+                        }
+                    case 1:
+                        {
+                            green_count += 1;
+                            break;
+                        }
+                    case 2:
+                        {
+                            red_count += 1;
+                            break;
+                        }
+                    case 3:
+                        {
+                            yellow_count += 1;
+                            break;
+                        }
+                }
+            }
+            if(red_count >= width || blue_count >= width || yellow_count >= width || green_count >= width){
+                    return true;
+            }
+        }
+        Debug.Log("No possible Match!");
+        return false;
+    }
+
+
 
     public bool isRemainMove(){
         if (remain_moves <= 0)
