@@ -17,6 +17,7 @@ public class LevelData
     }
 }
 
+//Stores the level selection to be played
 public class CurrentLevel
 {
     public static LevelData currentLevel;
@@ -26,6 +27,7 @@ public class CurrentLevel
     }
 }
 
+//Stores the last played level
 public class PlayedLevel
 {
     public static int playedLevelNo;

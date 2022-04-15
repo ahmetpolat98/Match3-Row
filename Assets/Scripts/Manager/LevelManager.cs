@@ -8,11 +8,11 @@ using UnityEngine.Networking;
 public class LevelManager : MonoBehaviour
 {
     public GameObject levelPrefab;
+
     private List<string> levelFiles;
     private List<string> levelData;
     private List<string> saveLevelData;
     private List<string> newScoreLvlData;
-    // private List<string> urls;
     private List<string> downloadlevelData;
 
     private string level_path;
@@ -24,13 +24,13 @@ public class LevelManager : MonoBehaviour
         newScoreLvlData = new List<string>();
         levelFiles = new List<string>();
         downloadlevelData = new List<string>();
-        // urls = new List<string>();
 
 
-        StartCoroutine(downloadLevel());
+        StartCoroutine(downloadLevel()); // downloads levels
 
-        readDownloadedFiles();
+        readDownloadedFiles(); //reads the levels loaded in storage
 
+        //If a high score is made at the level played, a new high score is written to the storage of the level.
         if(CurrentLevel.currentLevel != null){
             if (PlayedLevel.score > CurrentLevel.currentLevel.high_score && PlayedLevel.playedLevelNo == CurrentLevel.currentLevel.level_number)
             {
@@ -43,6 +43,8 @@ public class LevelManager : MonoBehaviour
 
         readFiles();    
     }
+
+    //The game's level files and save files are read.
     private void readFiles(){
         int lvl_no = 1;
 
@@ -51,7 +53,7 @@ public class LevelManager : MonoBehaviour
         {
             level_path = Application.streamingAssetsPath + "/Levels/" + item;
             save_level_data_path = Application.streamingAssetsPath + "/SaveLevelData/" + lvl_no;
-            // Debug.Log(level_path);//
+
             readLevelData(level_path);
             initLevelData();
 
@@ -61,7 +63,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-
+    //Downloaded levels are read from the file.
     private void readDownloadedFiles(){
         levelFiles.Clear();
         string path = Application.streamingAssetsPath + "/downloaded_files";
@@ -72,6 +74,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    //Level rows are created in the level pop-up
     private void createLevels(){
         for(int i = 1; i <= 25; i++){
             GameObject newLevel = Instantiate(levelPrefab);
@@ -81,7 +84,7 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-
+    //downloaded level data is written to file
     private void writeLevelFile(string text){
         Debug.Log("Save Downloaded Level File");
         string[] download_file_values = text.Split(' ', '\n');
@@ -95,6 +98,7 @@ public class LevelManager : MonoBehaviour
         File.AppendAllText(downloaded_path, download_file_values[1]);
     }
 
+    //Download manager, The file with the levels to be download is read and the levels are downloaded.
     private IEnumerator downloadLevel(){
             string path = Application.streamingAssetsPath + "/level_urls";
 
@@ -112,13 +116,10 @@ public class LevelManager : MonoBehaviour
 
                 string[] values = line_first.Split(" "[0]);
                 Debug.Log("Downloading Levels..");
-                // Debug.Log(i+1);
-                // Debug.Log(values[0]);
-                // Debug.Log(values[1]);
+
                 downloadlevelData.Add(values[0]);
                 downloadlevelData.Add(values[1]);
                 
-
                 UnityWebRequest www = new UnityWebRequest(downloadlevelData[1]);
                 www.downloadHandler = new DownloadHandlerBuffer();
                 yield return www.SendWebRequest();
@@ -130,13 +131,12 @@ public class LevelManager : MonoBehaviour
                 }
                 else
                 {
-
                     writeLevelFile(www.downloadHandler.text);
                     File.WriteAllLines(path, lines_except_first);
                     connection = true;
                 }
             }
-            // TODO lvler indirildikten sonra lvl file okuma işlemlerini yap, lvler güncellensin
+            // After the levels are downloaded, the installed levels are updated.
             if(fileLines.Count>=1 && connection){
                 readDownloadedFiles();
                 readFiles();
@@ -145,14 +145,13 @@ public class LevelManager : MonoBehaviour
             
     }
 
-
+    //
     private void readLevelData(string path){
         List<string> fileLines = File.ReadAllLines(path).ToList();
         levelData.Clear();
         foreach (string line in fileLines)
         {
             string[] values = line.Split(" "[0]);
-            // Debug.Log(values[1]);
             levelData.Add(values[1]);         
         }
     }
@@ -163,7 +162,6 @@ public class LevelManager : MonoBehaviour
         foreach (string line in fileLines)
         {
             string[] values = line.Split(" "[0]);
-            // Debug.Log(values[1]);
             saveLevelData.Add(values[1]);         
         }
     }
@@ -195,13 +193,11 @@ public class LevelManager : MonoBehaviour
         else
             level.levelData.locked = true;   
 
-        // Debug.Log("-----");
-        // Debug.Log(level.levelData.locked);
-        // Debug.Log(level.levelData.high_score);
         level.updateText();
         level.checkLocked();
     }
 
+    //When a new high score is made, the new score is written to the save file of the relevant level.
     private void writeNewHighScore(){
         string path1 = Application.streamingAssetsPath + "/SaveLevelData/" + PlayedLevel.playedLevelNo;
         int nextLvl = PlayedLevel.playedLevelNo + 1;

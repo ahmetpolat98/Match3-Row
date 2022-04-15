@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+//Each area on the board
 public class Tile : MonoBehaviour
 {
     public int x;

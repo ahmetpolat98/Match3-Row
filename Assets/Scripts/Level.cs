@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+//level row in the level list
 public class Level : MonoBehaviour
 {
     public LevelData levelData;
@@ -21,7 +22,7 @@ public class Level : MonoBehaviour
      private void Start(){        
         checkLocked();
         if(!levelData.locked)
-            playButton.onClick.AddListener(call:() => ScenesManager.LoadGame(levelData));
+            playButton.onClick.AddListener(call:() => ScenesManager.LoadGame(levelData)); // Adds listener to button if level is not locked
      }
 
     public void updateText(){
@@ -40,7 +41,7 @@ public class Level : MonoBehaviour
         }
     }
 
-
+    //It is checked whether the level is locked or not. Sprites and access changes are made accordingly.
     public void checkLocked(){
         GameObject child_play_button = gameObject.transform.Find("PlayButton").gameObject;
         if(levelData.locked){           

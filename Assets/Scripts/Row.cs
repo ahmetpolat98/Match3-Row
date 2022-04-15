@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//row on the board
 public class Row : MonoBehaviour
 {
     public GameObject tilePrefab;
@@ -11,6 +12,7 @@ public class Row : MonoBehaviour
         // tiles = new List<Tile>();
     }
 
+    //function adding column to row
     public void addTile(){
         GameObject node = Instantiate(tilePrefab);
         node.transform.SetParent(this.transform);

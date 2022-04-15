@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class ScenesManager : MonoBehaviour
 {
     
+    //While the game is loading, the selected level is transferred to the scene.
     public static void LoadGame(LevelData lvl){
         CurrentLevel.initCurrentLevel();
         CurrentLevel.currentLevel.level_number = lvl.level_number;

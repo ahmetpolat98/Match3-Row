@@ -8,27 +8,24 @@ using UnityEngine.UI;
 public class Board : MonoBehaviour
 {
     public static Board Instance {get; private set;} //Singleton Pattern
+
     public GameObject rowPrefab;
     public Sprite succesSprite;
-
     public Text scoreText;
     public Text remainMovesText;
     public Text highestScoreText;
 
     public List<Row> rows;
-    public List<int> lockedRows;
+    private List<int> lockedRows;
     public Tile[,] tiles {get; private set;}
     private List<Tile> _selection;
-    public LevelData currentLevel;
+    private LevelData currentLevel;
 
-    // public int width => tiles.GetLength(dimension:0);
-    // public int height => tiles.GetLength(dimension:1);
-    public int width;
-    public int height;
-    public int moves;
-    public int remain_moves;
-    // public int high_score;
-    public int score;
+    private int width;
+    private int height;
+    private int moves;
+    private int remain_moves;
+    private int score;
 
     private const float TweenDuration = 0.25f;
 
@@ -36,11 +33,11 @@ public class Board : MonoBehaviour
     private void Awake() => Instance = this;
 
     private void Start(){
-        currentLevel = CurrentLevel.currentLevel;
+        currentLevel = CurrentLevel.currentLevel; //Receiving the data of the level opened to be played.
         height = currentLevel.grid_height;
         width = currentLevel.grid_width;
         remain_moves = currentLevel.move_count;
-        // high_score = currentLevel.high_score;
+
         score = 0;
         moves = 0;
         _selection = new List<Tile>();
@@ -54,8 +51,8 @@ public class Board : MonoBehaviour
     }
 
 
-    //lvlin height ve widthine göre boardu oluşturuyor. default 4x4 board hazır(en az board büyüklüğü olduığu için) kalan width ve height a göre boarda row eklenir. row a da tile eklenir.
-    public void createBoard(int lvl_height, int lvl_width){
+    //The board is created as 4x4 by default. Row and tile are added to the board according to the height and width of the level.
+    private void createBoard(int lvl_height, int lvl_width){
         for (int i = 0; i < lvl_height-4; i++)
         {
             addRow();
@@ -69,16 +66,17 @@ public class Board : MonoBehaviour
         }
     }
 
-    //boardın rows listesine row ekleme, prefabı alınan rows'u oyun objesi olarak boardın childı olarak ekliyip, listeye ekliyorum.
-    public void addRow(){
+    //adding row
+    private void addRow(){
         GameObject new_row = Instantiate(rowPrefab);
         new_row.transform.SetParent(this.transform);
         new_row.transform.localScale= new Vector3(1,1,1);
         rows.Add(new_row.GetComponent<Row>());
     }
 
-    //tiles arrayini oluşturup, içerisine itemlerı yerleştirme
-    public void initTiles(int lvl_height, int lvl_width){
+    
+    //Creating an array of tiles and placing items in it
+    private void initTiles(int lvl_height, int lvl_width){
         tiles = new Tile[lvl_height, lvl_width];
 
         int gridNo = 0;
@@ -94,7 +92,6 @@ public class Board : MonoBehaviour
 
                 tile.Item = ItemDatabase.Items[findItem(currentLevel.grid[gridNo])];
                 gridNo += 1;
-                // tile.Item = ItemDatabase.Items[2]; // TODO find item.id
 
                 tiles[i, j] = tile;
             }
@@ -128,6 +125,7 @@ public class Board : MonoBehaviour
         }
     }
 
+    //Function to select tiles. Non-adjacent and tile selection conditions are checked. The swap function of tiles is called. The conditional at the end of the game is evaluated.
     public async void Select(Tile tile){
         if(!_selection.Contains(tile) && !isRowLocked(tile.y)){
             _selection.Add(tile);
@@ -155,7 +153,8 @@ public class Board : MonoBehaviour
 
     }
 
-    public async Task Swap(Tile tile1, Tile tile2){
+    //Swap operation and animation of 2 tiles are performed.
+    private async Task Swap(Tile tile1, Tile tile2){
         var icon1 = tile1.icon;
         var icon2 = tile2.icon;
 
@@ -182,12 +181,13 @@ public class Board : MonoBehaviour
 
     }
 
-    public bool areTilesNeighbour(Tile tile1, Tile tile2){
+    private bool areTilesNeighbour(Tile tile1, Tile tile2){
         if((tile1.x == tile2.x && Mathf.Abs(tile1.y-tile2.y) == 1) || (tile1.y == tile2.y && Mathf.Abs(tile1.x-tile2.x) == 1)) return true;
         return false;
     }
 
-    public bool checkRowMatch(int row){
+    //It is checked whether the row that comes as a parameter is match.
+    private bool checkRowMatch(int row){
         Item temp = tiles[row,0].Item;
         bool is_match = true;
         for (int i = 1; i < width; i++)
@@ -200,7 +200,9 @@ public class Board : MonoBehaviour
         }
         return is_match;
     }
-    public void checkRows(Tile tile1, Tile tile2){
+
+    //After the swap, the rows between the swapped tiles are checked. If the same row has been changed, it will not enter the match control.
+    private void checkRows(Tile tile1, Tile tile2){
         int row1 = tile1.y;
         int row2 = tile2.y;
         bool is_match1;
@@ -225,6 +227,7 @@ public class Board : MonoBehaviour
 
     }
 
+    //It is checked whether there is a row on the board that can be matched. If not, the game is over.
     private bool checkPossibleMatch(){
         int red_count = 0;
         int blue_count = 0;
@@ -276,8 +279,7 @@ public class Board : MonoBehaviour
     }
 
 
-
-    public bool isRemainMove(){
+    private bool isRemainMove(){
         if (remain_moves <= 0)
         {
             return false;
@@ -285,23 +287,23 @@ public class Board : MonoBehaviour
         return true;
     }
 
-    public void lockRow(int row){
+    //Locks the matched row
+    private void lockRow(int row){
         for (int i = 0; i < width; i++)
         {
             tiles[row, i].icon.transform.DOScale(1.25f, TweenDuration).Play();
             tiles[row, i].icon.sprite = succesSprite;
-            // tiles[row, i].Item.sprite = succesSprite;
-            //TODO icon success değiştir
         }
         lockedRows.Add(row);
     }
 
-    public bool isRowLocked(int row){
+    private bool isRowLocked(int row){
         if(!lockedRows.Contains(row))
             return false;
         return true;
     }
 
+    //Performs the scene transition when the game is over. Saves the game played.
     private void endGame(){
         PlayedLevel.playedLevelNo = currentLevel.level_number;
         PlayedLevel.score = score;
