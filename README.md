@@ -1,4 +1,4 @@
-Match3 game, you only get points if you match all rows. Matching rows are locked and you cannot change this row. 
+Match3 game, you get points if you match a whole row. Matching rows are locked and you cannot change this row. 
 
 -Demo Video Link:
 https://www.youtube.com/watch?v=R_hbg2J27gg
