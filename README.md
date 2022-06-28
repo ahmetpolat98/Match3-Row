@@ -9,3 +9,5 @@ https://www.youtube.com/watch?v=R_hbg2J27gg
 make them available to users for initial launch even without internet connection. As soon as
 possible, rest of the levels should be downloaded once from the given URLs and should be saved
 to persistent storage to be available for later launches.
+
+-If you can achieve the highest score of the level, you can get the chance to play the new level.
